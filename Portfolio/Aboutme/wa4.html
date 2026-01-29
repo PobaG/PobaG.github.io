@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>awfully blank</title>
+    <style>
+        /* Center the button in the viewport */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+
+        .big-btn {
+            font-size: clamp(20px, 5vw, 42px);
+            padding: 28px 44px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #f0f0f3 100%);
+            box-shadow: 0 10px 30px rgba(20, 20, 40, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: transform .14s ease, box-shadow .14s ease;
+            color: #111;
+            white-space: nowrap;
+        }
+
+        .big-btn:active {
+            transform: translateY(2px);
+        }
+
+        .big-btn:hover {
+            box-shadow: 0 14px 36px rgba(20, 20, 40, 0.16);
+        }
+
+        .big-btn:focus {
+            outline: 3px solid rgba(21, 156, 228, 0.18);
+            outline-offset: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="big-btn" type="button" onclick="location.href='next.html'"
+        aria-label="awfully blank, isn't it">awfully blank, isn't it</button>
+</body>
+
+</html>
