@@ -45,3 +45,7 @@ article {
     url("bottom-image.png") no-repeat bottom center,
     white;
 }
+
+h1 {
+  background: url("logo.png") no-repeat center center;
+}
