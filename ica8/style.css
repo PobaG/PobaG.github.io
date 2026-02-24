@@ -16,6 +16,11 @@ article {
   height: 297mm;
   margin: 20px auto;
   position: relative;
+  background:
+    url("top-image.png") no-repeat top center,
+    url("bottom-image.png") no-repeat bottom center,
+    linear-gradient(color-mix(in srgb, black 20%, white 80%), white 25%,
+      white 75%, color-mix(in srgb, black 20%, white 80%) 100%);
 }
 
 address {
@@ -36,17 +41,7 @@ h1 {
   padding: 44px 0;
   color: white;
   text-shadow: 1px 1px 1px black;
-}
-
-/* Your CSS below here */
-article {
-  background:
-    url("top-image.png") no-repeat top center,
-    url("bottom-image.png") no-repeat bottom center,
-    linear-gradient(color-mix(in srgb, black 20%, white 80%), white 25%,
-      white 75%, color-mix(in srgb, black 20%, white 80%) 100%);
-}
-
-h1 {
+  box-shadow: 3px 3px 3px black;
+  border-radius: 50%;
   background: url("logo.png") no-repeat center center;
 }
