@@ -1,0 +1,65 @@
+.site-header {
+    position: relative;
+    overflow: hidden;
+    padding: 20px, 20px;
+    border-radius: 0px;
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));
+}
+
+.site-header::before,
+.site-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.site-header::before {
+    background: linear-gradient(100deg,
+            #ff0000 0 8.33%,
+            #ff7f00 8.33% 25%,
+            #ffff00 25% 41.66%,
+            #00cc00 41.66% 58.33%,
+            #0066ff 58.33% 75%,
+            #8b00ff 75% 91.66%,
+            #ff0000 91.66% 100%);
+    background-repeat: repeat-x;
+    background-size: 520px 100%;
+    animation: candybar-drift 14s linear infinite;
+}
+
+.site-header>* {
+    position: relative;
+    z-index: 1;
+}
+
+.brand-text {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.portfolio-title {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.rightsidebutton {
+    position: fixed;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: right;
+}
+
+@keyframes candybar-drift {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 620px 0;
+    }
+}
