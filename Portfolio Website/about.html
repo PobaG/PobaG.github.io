@@ -8,45 +8,55 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="about-page">
     <header class="site-header">
         <a href="Landing Pipeline/landing.html" class="brand" aria-label="Go to start">
             <span class="brand-text">poba</span>
         </a>
-        <div style="text-align:center;">
+        <div class="header-title">
             <a href="home.html" aria-label="Giovanni Palazzolo Portfolio">
                 <span class="portfolio-title">Giovanni Palazzolo Portfolio</span>
             </a>
         </div>
     </header>
 
-    <main>
-        <h1>About</h1>
-        <p>This page is all about me.
+    <main class="page-main">
+        <section class="page-section">
+            <div class="section-inner">
+                <h1>About</h1>
+                <p>This page is all about me.
 
-            <br>
-            My name is Giovanni Palazzolo, and I am a student at the University of Boulder studying
-            Computer Science and Business Operaions management.
-            <br>
-            I enjoy coding, eating vegetables, and fantasizing about situations where I have to defend myself and those I love.
-            <br>
-            Feel free to check out my <a href="https://github.com/PobaG">GitHub</a>.
-            <br><br>
-            my main goals in life are to live, laugh, and love.
-<br><br>
-            I want to do this through creative mediums, such as storytelling, video creation, and business.
-            
-        </p>
+                    <br>
+                    My name is Giovanni Palazzolo, and I am a student at the University of Boulder studying
+                    Computer Science and Business Operaions management.
+                    <br>
+                    I enjoy coding, eating vegetables, and fantasizing about situations where I have to defend myself and those I love.
+                    <br>
+                    Feel free to check out my <a href="https://github.com/PobaG">GitHub</a>.
+                    <br><br>
+                    my main goals in life are to live, laugh, and love.
+                    <br><br>
+                    I want to do this through creative mediums, such as storytelling, video creation, and business.
+                </p>
+            </div>
+        </section>
+        <section class="page-section">
+            <div class="section-inner">
+                <h2>Movement Photos</h2>
+                <div class="gallery" role="region" aria-label="About gallery">
+                    <img src="Assets/calisthenics.jpg" alt="Giovanni holding a one-arm elbow lever on a rock in Boulder Creek." width="200">
+                    <img src="Assets/runningman.png" alt="Cartoon running figure that reflects an appreciation for bodybuilding and fitness YouTube." width="200">
+                </div>
+                <p>a picture of me doing a one arm elbow lever on a rock in boulder creek. Tbh i only held it for a second but my homie managed to take the absolute SICKEST shot of my whole lifetime.</p>
+            </div>
+        </section>
     </main>
 
     <div class="rightsidebutton">
-        <input type="button" value="Home" onclick="location.href='home.html'">
-        <br>
-        <input type="button" value="About" onclick="location.href='about.html'">
-        <br>
-        <input type="button" value="Contact" onclick="location.href='contact.html'">
-        <br>
-        <input type="button" value="Business" onclick="location.href='business.html'">
+        <a class="nav-button nav-home" href="home.html">Home</a>
+        <a class="nav-button nav-about" href="about.html">About</a>
+        <a class="nav-button nav-contact" href="contact.html">Contact</a>
+        <a class="nav-button nav-business" href="business.html">Business</a>
     </div>
 </body>
 

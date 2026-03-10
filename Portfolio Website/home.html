@@ -8,40 +8,62 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="home-page">
     <header class="site-header">
         <a href="Landing Pipeline/landing.html" class="brand" aria-label="Go to start">
             <span class="brand-text">poba</span>
         </a>
-        <div style="text-align:center;">
+        <div class="header-title">
             <a href="home.html" aria-label="Giovanni Palazzolo Portfolio">
                 <span class="portfolio-title">Giovanni Palazzolo Portfolio</span>
             </a>
         </div>
-        <h1>OK OK You made it! Welcome to my web page.</h1>
     </header>
 
-
-    <main>
-        <div class="gallery" role="region" aria-label="Image gallery">
-            <img src="headshot.jpg" alt="A picture of me standing in front of the world's largest milk jug." width="200">
-            <br>
-            <img src="runningman.png" alt="A picture of me when i'm a cartoon" width="200">
+    <section class="home-hero" aria-label="Welcome">
+        <div class="hero-message">
+            <h1>OK OK You made it! Welcome to my web page. <br>&darr;</h1>
         </div>
-        <aside>
-            <h2>Yellow!</h2>
-            <p>My name is Giovanni Palazzolo, and I am a computer science student at the University of Colorado Boulder. I have a passion for music, technology, and storytelling. I enjoy creating videos and computer animations. In my free time, I like to play video games, hangout with those I love, and save tons of money on anything that I can save money on. Finance is so much fun. Investing and trading is super cool too. Such a fun hobby </p>
-        </aside>
+    </section>
+
+    <main class="page-main">
+        <section class="page-section scroll-hold">
+            <div class="section-inner sticky-block gallery" role="region" aria-label="Image gallery">
+                <img src="Assets/headshot.jpg" alt="Headshot photo of Giovanni."
+                    width="200">
+                <img src="Assets/runningman.png" alt="Cartoon running figure that nods to bodybuilding and fitness YouTube."
+                    width="200">
+                <p class="gallery-copy">A quick intro with a straight-up headshot and the running character I use to show some appreciation for bodybuilding and other fitness YouTube channels.</p>
+            </div>
+        </section>
+        <section class="page-section scroll-hold">
+            <aside class="section-inner sticky-block">
+                <h2>'Sup</h2>
+                <p>My name is Giovanni Palazzolo, and I am a computer science student at the University of Colorado
+                    Boulder.
+                    I have a passion for music, technology, and storytelling. I enjoy creating videos and computer
+                    animations. In my free time, I like to play video games, hangout with those I love, and save tons of
+                    money on anything that I can save money on. Finance is so much fun. Investing and trading is super
+                    cool
+                    too. Such a fun hobby </p>
+            </aside>
+        </section>
+        <section class="page-section scroll-hold">
+            <div class="section-inner sticky-block">
+                <h2>Web Portfolio</h2>
+                <p>This website was originally created for ATLS Web, we just out here makin' websites and sh'</p>
+
+                <p>Here you should be able to find anything &amp; everything related to me, feel free to toy with the
+                    buttons on the right for some more detailed information.</p>
+            </div>
+        </section>
     </main>
 
     <div class="rightsidebutton">
-        <input type="button" value="Home" onclick="location.href='home.html'">
-        <br>
-        <input type="button" value="About" onclick="location.href='about.html'">
-        <br>
-        <input type="button" value="Contact" onclick="location.href='contact.html'">
-        <br>
-        <input type="button" value="Business" onclick="location.href='business.html'">
+        <a class="nav-button nav-home" href="home.html">Home</a>
+        <a class="nav-button nav-about" href="about.html">About</a>
+        <a class="nav-button nav-contact" href="contact.html">Contact</a>
+        <a class="nav-button nav-business" href="business.html">Business</a>
     </div>
 </body>
 

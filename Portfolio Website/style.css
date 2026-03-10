@@ -1,21 +1,25 @@
-.site-header {
-    position: relative;
-    overflow: hidden;
-    padding: 20px, 20px;
-    border-radius: 0px;
-    background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));
+* {
+    box-sizing: border-box;
 }
 
-.site-header::before,
-.site-header::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+img {
+    display: block;
+    max-width: 100%;
 }
 
-.site-header::before {
+a {
+    color: inherit;
+}
+
+body {
+    margin: 0;
+    background: #fffefa;
+    font-family: "Times New Roman", Times, serif;
+}
+
+.site-header,
+.home-hero::before,
+body:not(.home-page) .site-header::before {
     background: linear-gradient(100deg,
             #ff0000 0 8.33%,
             #ff7f00 8.33% 25%,
@@ -29,29 +33,203 @@
     animation: candybar-drift 14s linear infinite;
 }
 
-.site-header>* {
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    overflow: hidden;
+    padding: 16px 24px;
+    background: transparent;
+}
+
+.site-header::before,
+.home-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+body:not(.home-page) .site-header::before {
+    opacity: 1;
+}
+
+.brand,
+.header-title,
+.hero-message {
     position: relative;
     z-index: 1;
 }
 
-.brand-text {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 12px;
+.brand {
+    justify-self: start;
+}
+
+.brand-text,
+.portfolio-title {
     font-weight: bold;
 }
 
+.brand-text {
+    font-size: 12px;
+}
+
+.header-title {
+    grid-column: 2;
+    text-align: center;
+}
+
 .portfolio-title {
-    font-family: 'Times New Roman', Times, serif;
     font-size: 32px;
-    font-weight: bold;
+}
+
+.home-page .site-header {
+    margin-bottom: -72px;
+}
+
+.home-hero {
+    position: sticky;
+    top: -90vh;
+    z-index: 10;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 96px 24px 24px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));
+}
+
+.hero-message {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    align-self: stretch;
+}
+
+.hero-message h1 {
+    margin: 0;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1.05;
+}
+
+.page-section {
+    min-height: 72vh;
+    padding: 32px 48px;
+}
+
+.home-page .page-section {
+    background: #f4efd4;
+}
+
+.about-page .page-section {
+    background: #f7cb15;
+}
+
+.contact-page .page-section {
+    background: #878e88;
+}
+
+.business-page .page-section {
+    background: #d34f73;
+}
+
+.scroll-hold {
+    min-height: 120vh;
+}
+
+.section-inner {
+    width: min(100%, 960px);
+    margin: 0 auto;
+}
+
+.sticky-block {
+    position: sticky;
+    top: 128px;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.gallery-copy {
+    width: 100%;
+    margin: 0;
+    text-align: center;
 }
 
 .rightsidebutton {
     position: fixed;
-    right: 8px;
     top: 50%;
+    right: 8px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     transform: translateY(-50%);
     text-align: right;
+}
+
+.nav-button {
+    position: relative;
+    z-index: 0;
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 16px;
+    text-decoration: none;
+    cursor: pointer;
+    isolation: isolate;
+    transition: transform 180ms ease;
+}
+
+.nav-button::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    z-index: -1;
+    width: 80vmax;
+    height: 80vmax;
+    border-radius: 50%;
+    transform: translate(50%, -50%) scale(0);
+    transition: transform 560ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.nav-button:hover {
+    transform: translate(-0.25em, 0.25em) scale(1.12) rotate(-4deg);
+}
+
+.nav-button:hover::before {
+    transform: translate(50%, -50%) scale(1);
+}
+
+.nav-home::before {
+    background: #f4efd4;
+}
+
+.nav-about::before {
+    background: #f7cb15;
+}
+
+.nav-contact::before {
+    background: #878e88;
+}
+
+.nav-business::before {
+    background: #d34f73;
 }
 
 @keyframes candybar-drift {
@@ -61,5 +239,20 @@
 
     to {
         background-position: 620px 0;
+    }
+}
+
+@media (max-width: 720px) {
+    .page-section {
+        min-height: auto;
+        padding: 24px;
+    }
+
+    .scroll-hold {
+        min-height: auto;
+    }
+
+    .sticky-block {
+        position: static;
     }
 }
