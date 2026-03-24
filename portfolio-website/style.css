@@ -44,7 +44,7 @@ body {
     --page-surface: #fffefa;
 
     margin: 0;
-    background: #fffefa;
+    background: var(--page-surface);
     color: var(--text-strong);
     font-family: var(--font-body);
     font-size: 150%;
