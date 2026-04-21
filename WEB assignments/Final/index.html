@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Three-Body Volume Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="prototype">
+    <p class="readout" id="volumeReadout" aria-live="polite">Current volume: 0.0%</p>
+
+    <div class="slider-stack">
+      <div class="slider-row">
+        <input
+          id="sliderA"
+          class="body-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.001"
+          value="0"
+          aria-label="Primary slider"
+        >
+        <span class="equation">y = x</span>
+      </div>
+
+      <div class="slider-row">
+        <input
+          id="sliderB"
+          class="body-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.001"
+          value="0"
+          aria-label="Secondary slider"
+        >
+        <span class="equation">y = sin((&pi;/2)x<sup>2</sup>)</span>
+      </div>
+
+      <div class="slider-row">
+        <input
+          id="sliderC"
+          class="body-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.001"
+          value="0"
+          aria-label="Tertiary slider"
+        >
+        <span class="equation">y = sin((&pi;/4)(x<sup>3</sup> + x))</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
