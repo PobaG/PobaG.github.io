@@ -63,12 +63,14 @@
     const stageOne = Math.min(a, 0.1);
 
     const unlockTwo = smoothstep(0.1, 0.22, a);
-    const curveTwo = Math.sin((Math.PI / 2) * Math.pow(b, 2));
-    const stageTwo = 0.5 * unlockTwo * curveTwo;
+    const waveTwo = Math.sin(Math.PI * Math.pow(b, 2) * (1 + 8 * a));
+    const stageTwo = 0.5 * unlockTwo * Math.max(0, waveTwo);
 
-    const unlockThree = smoothstep(0.12, 0.3, stageTwo);
-    const curveThree = Math.sin((Math.PI / 4) * (Math.pow(c, 3) + c));
-    const stageThree = 0.4 * unlockThree * curveThree;
+    const unlockThree = smoothstep(0.1, 0.28, stageTwo);
+    const waveThree = Math.sin(
+      Math.PI * ((1 + 2 * a + 4 * b) * Math.pow(c, 3) + c * (0.4 + 1.8 * b * b))
+    );
+    const stageThree = 0.4 * unlockThree * Math.max(0, waveThree);
 
     return {
       a,
@@ -79,8 +81,8 @@
       stageThree,
       unlockTwo,
       unlockThree,
-      curveTwo,
-      curveThree,
+      waveTwo,
+      waveThree,
       volume: clamp01(stageOne + stageTwo + stageThree),
     };
   }
