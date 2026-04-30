@@ -3,55 +3,129 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Three-Body Volume Prototype</title>
+  <title>Equation Graph Prototype</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="prototype">
-    <p class="readout" id="volumeReadout" aria-live="polite">Current volume: 0.0%</p>
+    <p class="volume-banner" id="currentVolume" aria-live="polite">Current Volume: 0%</p>
+    <p class="submission-status" id="submissionStatus" aria-live="polite"></p>
 
     <div class="slider-stack">
-      <div class="slider-row">
-        <input
-          id="sliderA"
-          class="body-slider"
-          type="range"
-          min="0"
-          max="1"
-          step="0.001"
-          value="0"
-          aria-label="Primary slider"
-        >
-        <span class="equation">y = x</span>
-      </div>
+      <label class="slider-row" for="sliderRider">
+        <div class="slider-control">
+          <span class="slider-tag"><span class="slider-name slider-name-lowercase">a</span></span>
+          <input
+            id="sliderRider"
+            class="body-slider"
+            type="range"
+            min="0"
+            max="100"
+            step="0.1"
+            value="0"
+            aria-label="a slider"
+          >
+          <output class="slider-value" id="valueRider">0</output>
+        </div>
+        <span class="equation" id="equationRider">a changes y<sub>1</sub>, sets the y<sub>2</sub> divisor as ((a / 100) + 1), and places the dot at x = a.</span>
+      </label>
 
-      <div class="slider-row">
-        <input
-          id="sliderB"
-          class="body-slider"
-          type="range"
-          min="0"
-          max="1"
-          step="0.001"
-          value="0"
-          aria-label="Secondary slider"
-        >
-        <span class="equation">y = sin((&pi;/2)x<sup>2</sup>)</span>
-      </div>
+      <label class="slider-row" for="sliderB">
+        <div class="slider-control">
+          <span class="slider-tag">B</span>
+          <input
+            id="sliderB"
+            class="body-slider sleeping"
+            type="range"
+            min="0"
+            max="10"
+            step="0.1"
+            value="0"
+            aria-label="B slider"
+            disabled
+          >
+          <output class="slider-value" id="valueB">0</output>
+        </div>
+        <span class="equation" id="equationB">B is locked until current volume reaches 48.5%.</span>
+      </label>
 
-      <div class="slider-row">
-        <input
-          id="sliderC"
-          class="body-slider"
-          type="range"
-          min="0"
-          max="1"
-          step="0.001"
-          value="0"
-          aria-label="Tertiary slider"
-        >
-        <span class="equation">y = sin((&pi;/4)(x<sup>3</sup> + x))</span>
+      <label class="slider-row" for="sliderC">
+        <div class="slider-control">
+          <span class="slider-tag">C</span>
+          <input
+            id="sliderC"
+            class="body-slider sleeping"
+            type="range"
+            min="-1.6"
+            max="4.7"
+            step="0.1"
+            value="-1.6"
+            aria-label="C slider"
+            disabled
+          >
+          <output class="slider-value" id="valueC">-1.6</output>
+        </div>
+        <span class="equation" id="equationC">C is locked until current volume reaches 88%.</span>
+      </label>
+
+      <button class="submit-volume-button" id="submitVolumeButton" type="button">Submit Volume</button>
+    </div>
+
+    <details class="dropdown-panel">
+      <summary class="dropdown-summary">
+        <span>easy mode</span>
+        <span class="dropdown-arrow" aria-hidden="true">v</span>
+      </summary>
+      <div class="dropdown-body">
+        <p class="readout" id="volumeReadout" aria-live="polite">Only V is graphed. a = 0, B = 0, C = -1.6.</p>
+        <section class="graph-panel" aria-labelledby="graphTitle">
+          <p class="graph-title" id="graphTitle">Graph Of V(x)</p>
+          <p class="graph-equation" id="graphEquation">V(x) = y<sub>1</sub> + y<sub>2</sub> / ((a / 100) + 1) + x cos(y<sub>2</sub> + C)</p>
+          <svg id="volumeGraph" class="output-graph" viewBox="0 0 520 240" role="img" aria-label="Graph of V over x">
+            <defs>
+              <clipPath id="graphClip">
+                <rect id="graphClipRect"></rect>
+              </clipPath>
+            </defs>
+            <g id="graphGrid"></g>
+            <path class="graph-axis" id="graphAxisX"></path>
+            <path class="graph-axis" id="graphAxisY"></path>
+            <path class="graph-line" id="volumeGraphLine" clip-path="url(#graphClip)"></path>
+            <circle id="volumeGraphRider" class="graph-rider" r="5" clip-path="url(#graphClip)"></circle>
+            <g id="graphLabels"></g>
+          </svg>
+          <p class="graph-meta" id="graphMeta">x range: 0 to 100 | y range: 0 to 100</p>
+        </section>
       </div>
+    </details>
+
+    <!--
+      Math lock:
+      The y1, y2, y3, and V equations are intentionally finalized.
+      Do not change the mathematics or equation wording unless the user explicitly asks for a math update.
+    -->
+    <details class="dropdown-panel">
+      <summary class="dropdown-summary">
+        <span>for tryhards</span>
+        <span class="dropdown-arrow" aria-hidden="true">v</span>
+      </summary>
+      <div class="dropdown-body">
+        <section class="equation-stack" aria-label="Equation list">
+          <p class="equation equation-display" id="equationY1">y<sub>1</sub> = ((-2a / 100) + 1)x + a</p>
+          <p class="equation equation-display" id="equationY2">y<sub>2</sub> = B sin(y<sub>1</sub> * 1)</p>
+          <p class="equation equation-display" id="equationY3">y<sub>3</sub> = x cos(y<sub>2</sub> + C)</p>
+          <p class="equation equation-display" id="equationV">V = y<sub>1</sub> + y<sub>2</sub> / ((a / 100) + 1) + y<sub>3</sub></p>
+        </section>
+      </div>
+    </details>
+
+    <div class="submission-modal" id="submissionModal" hidden>
+      <div class="submission-modal-backdrop" id="submissionModalBackdrop"></div>
+      <section class="submission-modal-card" role="dialog" aria-modal="true" aria-labelledby="submissionModalTitle">
+        <p class="submission-modal-title" id="submissionModalTitle">Volume Submitted</p>
+        <p class="submission-modal-message" id="submissionModalMessage"></p>
+        <button class="submission-modal-close" id="submissionModalClose" type="button">Close</button>
+      </section>
     </div>
   </main>
 

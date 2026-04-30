@@ -1,150 +1,356 @@
-(function () {
-  const sliderA = document.getElementById("sliderA");
+(() => {
   const sliderB = document.getElementById("sliderB");
   const sliderC = document.getElementById("sliderC");
+  const sliderRider = document.getElementById("sliderRider");
+  const valueB = document.getElementById("valueB");
+  const valueC = document.getElementById("valueC");
+  const valueRider = document.getElementById("valueRider");
+  const currentVolume = document.getElementById("currentVolume");
+  const submissionStatus = document.getElementById("submissionStatus");
+  const submitVolumeButton = document.getElementById("submitVolumeButton");
+  const submissionModal = document.getElementById("submissionModal");
+  const submissionModalBackdrop = document.getElementById("submissionModalBackdrop");
+  const submissionModalMessage = document.getElementById("submissionModalMessage");
+  const submissionModalClose = document.getElementById("submissionModalClose");
   const readout = document.getElementById("volumeReadout");
+  const graphEquation = document.getElementById("graphEquation");
+  const graphMeta = document.getElementById("graphMeta");
+  const equationY1 = document.getElementById("equationY1");
+  const equationY2 = document.getElementById("equationY2");
+  const equationY3 = document.getElementById("equationY3");
+  const equationV = document.getElementById("equationV");
+  const equationB = document.getElementById("equationB");
+  const equationC = document.getElementById("equationC");
+  const equationRider = document.getElementById("equationRider");
+  const graphLine = document.getElementById("volumeGraphLine");
+  const graphRider = document.getElementById("volumeGraphRider");
+  const graphAxisX = document.getElementById("graphAxisX");
+  const graphAxisY = document.getElementById("graphAxisY");
+  const graphGrid = document.getElementById("graphGrid");
+  const graphLabels = document.getElementById("graphLabels");
+  const graphClipRect = document.getElementById("graphClipRect");
+  const sliderBRow = sliderB.closest(".slider-row");
+  const sliderCRow = sliderC.closest(".slider-row");
+  let hasUnlockedB = false;
+  let hasUnlockedC = false;
+  let hasUserStartedProgress = false;
+  let latestCurrentVolumePercent = 0;
 
-  const sliders = [sliderA, sliderB, sliderC];
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const graph = {
+    width: 520,
+    height: 240,
+    padLeft: 42,
+    padRight: 16,
+    padTop: 18,
+    padBottom: 32,
+    samples: 400,
+    xMin: 0,
+    xMax: 100,
+    yMin: 0,
+    yMax: 100,
+  };
 
-  let audioCtx;
-  let masterGain;
-  let toneLow;
-  let toneHigh;
-
-  const clamp01 = (value) => Math.max(0, Math.min(1, value));
-
-  function smoothstep(edge0, edge1, value) {
-    const span = edge1 - edge0;
-    if (span <= 0) {
-      return value >= edge1 ? 1 : 0;
-    }
-
-    const t = clamp01((value - edge0) / span);
-    return t * t * (3 - 2 * t);
+  function formatNumber(value, digits = 2) {
+    return Number.parseFloat(value.toFixed(digits)).toString();
   }
 
-  function ensureAudio() {
-    if (audioCtx) {
+  function createSvgElement(name, attributes) {
+    const element = document.createElementNS(SVG_NS, name);
+    Object.entries(attributes).forEach(([key, value]) => {
+      element.setAttribute(key, value);
+    });
+    return element;
+  }
+
+  function setSliderFill(slider) {
+    const min = parseFloat(slider.min);
+    const max = parseFloat(slider.max);
+    const value = parseFloat(slider.value);
+    const percent = ((value - min) / (max - min)) * 100;
+
+    slider.style.setProperty("--fill-size", `${percent.toFixed(2)}%`);
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function setSliderLocked(slider, sliderRow, locked) {
+    slider.disabled = locked;
+    slider.classList.toggle("sleeping", locked);
+    slider.setAttribute("aria-disabled", String(locked));
+    sliderRow.classList.toggle("is-locked", locked);
+  }
+
+  function getSubmissionMessage(volumePercent) {
+    const volumeText = formatNumber(volumePercent, 1);
+
+    if (volumePercent <= 10) {
+      return `Dang ${volumeText}%? That is not a volume setting. That is a nervous apology with a slider attached.`;
+    }
+
+    if (volumePercent < 25) {
+      return `${volumeText}%? You submitted that with your full chest? Because the volume definitely did not.`;
+    }
+
+    if (volumePercent < 48.5) {
+      return `${volumeText}%? You are hovering in the "almost interesting" zone. Real commitment remains a rumor.`;
+    }
+
+    if (volumePercent < 70) {
+      return `${volumeText}%? Fine. Respectable. You finally stopped playing like the substitute teacher was watching.`;
+    }
+
+    if (volumePercent < 88) {
+      return `${volumeText}%? Okay, now the slider has a spine. Took you long enough.`;
+    }
+
+    if (volumePercent < 99.5) {
+      return `${volumeText}%? Extremely loud behavior. This is the kind of confidence that gets group projects ruined.`;
+    }
+
+    return `Dang 100%? how did you even get that high? PHD in physics?`;
+  }
+
+  function openSubmissionModal(message) {
+    submissionModalMessage.textContent = message;
+    submissionModal.hidden = false;
+    submissionModalClose.focus();
+  }
+
+  function closeSubmissionModal() {
+    submissionModal.hidden = true;
+  }
+
+  function updateUnlockState(currentVolumePercent) {
+    if (!hasUserStartedProgress) {
       return;
     }
 
-    const AudioCtor = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtor) {
-      return;
+    if (!hasUnlockedB && currentVolumePercent >= 48.5) {
+      hasUnlockedB = true;
     }
 
-    audioCtx = new AudioCtor();
-    masterGain = audioCtx.createGain();
-    masterGain.gain.value = 0;
-
-    toneLow = audioCtx.createOscillator();
-    toneLow.type = "sine";
-    toneLow.frequency.value = 132;
-
-    toneHigh = audioCtx.createOscillator();
-    toneHigh.type = "triangle";
-    toneHigh.frequency.value = 264;
-    toneHigh.detune.value = 6;
-
-    const highMix = audioCtx.createGain();
-    highMix.gain.value = 0.28;
-
-    toneLow.connect(masterGain);
-    toneHigh.connect(highMix);
-    highMix.connect(masterGain);
-    masterGain.connect(audioCtx.destination);
-
-    toneLow.start();
-    toneHigh.start();
+    if (!hasUnlockedC && currentVolumePercent >= 88) {
+      hasUnlockedC = true;
+    }
   }
 
-  // The three-stage puzzle lives here, so you can swap equations quickly.
-  function computeState(a, b, c) {
-    const stageOne = Math.min(a, 0.1);
+  // Math lock:
+  // The y1, y2, y3, and V definitions below are intentionally finalized.
+  // Do not modify the mathematics or synced equation text unless the user explicitly asks for a math change.
+  function evaluatePoint(x, a, b, c) {
+    const y1 = (((-2 * a) / 100) + 1) * x + a;
+    const y2 = b * Math.sin(y1);
+    const y3 = x * Math.cos(y2 + c);
+    const v = y1 + y2 / ((a / 100) + 1) + y3;
 
-    const unlockTwo = smoothstep(0.1, 0.22, a);
-    const waveTwo = Math.sin(Math.PI * Math.pow(b, 2) * (1 + 8 * a));
-    const stageTwo = 0.5 * unlockTwo * Math.max(0, waveTwo);
+    return { x, y1, y2, y3, v };
+  }
 
-    const unlockThree = smoothstep(0.1, 0.28, stageTwo);
-    const waveThree = Math.sin(
-      Math.PI * ((1 + 2 * a + 4 * b) * Math.pow(c, 3) + c * (0.4 + 1.8 * b * b))
+  function sampleCurve(a, b, c) {
+    const points = [];
+    const span = graph.xMax - graph.xMin;
+
+    for (let index = 0; index <= graph.samples; index += 1) {
+      const x = graph.xMin + (span * index) / graph.samples;
+      points.push(evaluatePoint(x, a, b, c));
+    }
+
+    return points;
+  }
+
+  function mapX(x) {
+    const plotWidth = graph.width - graph.padLeft - graph.padRight;
+    return graph.padLeft + ((x - graph.xMin) / (graph.xMax - graph.xMin)) * plotWidth;
+  }
+
+  function mapY(y) {
+    const plotHeight = graph.height - graph.padTop - graph.padBottom;
+    return graph.height - graph.padBottom - ((y - graph.yMin) / (graph.yMax - graph.yMin)) * plotHeight;
+  }
+
+  function buildPath(points) {
+    return points
+      .map((point, index) => {
+        const command = index === 0 ? "M" : "L";
+        return `${command} ${mapX(point.x).toFixed(2)} ${mapY(point.v).toFixed(2)}`;
+      })
+      .join(" ");
+  }
+
+  function renderGrid() {
+    graphGrid.replaceChildren();
+    graphLabels.replaceChildren();
+    graphClipRect.setAttribute("x", graph.padLeft.toFixed(2));
+    graphClipRect.setAttribute("y", graph.padTop.toFixed(2));
+    graphClipRect.setAttribute("width", (graph.width - graph.padLeft - graph.padRight).toFixed(2));
+    graphClipRect.setAttribute("height", (graph.height - graph.padTop - graph.padBottom).toFixed(2));
+
+    const xTicks = [0, 20, 40, 60, 80, 100];
+    xTicks.forEach((tick) => {
+      const x = mapX(tick).toFixed(2);
+      const y = (graph.height - 10).toFixed(2);
+
+      graphGrid.appendChild(
+        createSvgElement("line", {
+          class: "graph-grid",
+          x1: x,
+          y1: graph.padTop.toFixed(2),
+          x2: x,
+          y2: (graph.height - graph.padBottom).toFixed(2),
+        })
+      );
+
+      graphLabels.appendChild(
+        createSvgElement("text", {
+          class: "graph-label",
+          x,
+          y,
+          "text-anchor": "middle",
+        })
+      ).textContent = formatNumber(tick, 1);
+    });
+
+    [0, 20, 40, 60, 80, 100].forEach((tick) => {
+      const y = mapY(tick).toFixed(2);
+
+      graphGrid.appendChild(
+        createSvgElement("line", {
+          class: "graph-grid",
+          x1: graph.padLeft.toFixed(2),
+          y1: y,
+          x2: (graph.width - graph.padRight).toFixed(2),
+          y2: y,
+        })
+      );
+
+      graphLabels.appendChild(
+        createSvgElement("text", {
+          class: "graph-label",
+          x: (graph.padLeft - 8).toFixed(2),
+          y: (mapY(tick) + 4).toFixed(2),
+          "text-anchor": "end",
+        })
+      ).textContent = formatNumber(tick, 1);
+    });
+
+    const xAxisY = mapY(0).toFixed(2);
+    const yAxisX = mapX(0).toFixed(2);
+
+    graphAxisX.setAttribute(
+      "d",
+      `M ${graph.padLeft.toFixed(2)} ${xAxisY} H ${(graph.width - graph.padRight).toFixed(2)}`
     );
-    const stageThree = 0.4 * unlockThree * Math.max(0, waveThree);
-
-    return {
-      a,
-      b,
-      c,
-      stageOne,
-      stageTwo,
-      stageThree,
-      unlockTwo,
-      unlockThree,
-      waveTwo,
-      waveThree,
-      volume: clamp01(stageOne + stageTwo + stageThree),
-    };
+    graphAxisY.setAttribute(
+      "d",
+      `M ${yAxisX} ${graph.padTop.toFixed(2)} V ${(graph.height - graph.padBottom).toFixed(2)}`
+    );
   }
 
-  function paintSlider(slider, value, wake) {
-    const fill = `${(value * 100).toFixed(3)}%`;
-    const wakeMix = clamp01(wake);
-    const fillOpacity = 0.12 + 0.58 * wakeMix;
-    const trackOpacity = 0.07 + 0.12 * wakeMix;
+  function renderText(a, b, c, riderPoint, currentVolumePercent) {
+    const origin = evaluatePoint(0, a, b, c);
+    const aText = formatNumber(a, 1);
+    const bText = formatNumber(b, 1);
+    const cText = formatNumber(c, 1);
+    const y1SlopeText = formatNumber(((-2 * a) / 100) + 1);
+    const currentVolumeText = formatNumber(currentVolumePercent, 1);
+    const vAtAText = formatNumber(riderPoint.v);
 
-    slider.style.setProperty("--fill-size", fill);
-    slider.style.setProperty("--fill", `rgba(119, 214, 194, ${fillOpacity.toFixed(3)})`);
-    slider.style.setProperty("--track", `rgba(232, 241, 237, ${trackOpacity.toFixed(3)})`);
-    slider.classList.toggle("sleeping", wakeMix < 0.12);
-  }
-
-  function syncAudio(volume) {
-    if (!audioCtx || !masterGain) {
-      return;
-    }
-
-    const target = Math.pow(volume, 1.2) * 0.16;
-    const now = audioCtx.currentTime;
-
-    masterGain.gain.cancelScheduledValues(now);
-    masterGain.gain.setTargetAtTime(target, now, 0.05);
+    valueB.textContent = bText;
+    valueC.textContent = cText;
+    valueRider.textContent = aText;
+    currentVolume.textContent = `Current Volume: ${currentVolumeText}%`;
+    readout.textContent =
+      `Only V is graphed. a = ${aText}, B = ${bText}, C = ${cText}, V(a) = ${vAtAText}, V(0) = ${formatNumber(origin.v)}.`;
+    graphEquation.innerHTML =
+      `V(x) = y<sub>1</sub> + y<sub>2</sub> / ((${aText} / 100) + 1) + x cos(y<sub>2</sub> + ${cText})`;
+    graphMeta.textContent = `x range: ${graph.xMin} to ${graph.xMax} | y range: ${graph.yMin} to ${graph.yMax}`;
+    equationY1.innerHTML = `y<sub>1</sub> = (${y1SlopeText})x + ${aText}`;
+    equationY2.innerHTML = `y<sub>2</sub> = ${bText} sin(y<sub>1</sub> * 1)`;
+    equationY3.innerHTML =
+      `y<sub>3</sub> = x cos(y<sub>2</sub> + ${cText})`;
+    equationV.innerHTML = `V = y<sub>1</sub> + y<sub>2</sub> / ((${aText} / 100) + 1) + y<sub>3</sub>`;
+    equationB.textContent = hasUnlockedB
+      ? `B range: 0 to 10. Higher B increases the swing inside y2.`
+      : `B is locked until current volume reaches 48.5%.`;
+    equationC.textContent = hasUnlockedC
+      ? `C range: -1.6 to 4.7. C shifts the cosine term used inside y3.`
+      : `C is locked until current volume reaches 88%.`;
+    equationRider.textContent = `a = ${aText}; it makes y1 = (${y1SlopeText})x + ${aText}, divides y2 by ((${aText} / 100) + 1), and places the dot at x = a where V(a) = ${vAtAText}.`;
   }
 
   function render() {
-    const state = computeState(
-      parseFloat(sliderA.value),
-      parseFloat(sliderB.value),
-      parseFloat(sliderC.value)
-    );
+    const a = parseFloat(sliderRider.value);
+    const b = parseFloat(sliderB.value);
+    const c = parseFloat(sliderC.value);
+    const points = sampleCurve(a, b, c);
+    const riderPoint = evaluatePoint(a, a, b, c);
+    const currentVolumePercent = clamp(riderPoint.v, graph.yMin, graph.yMax);
+    latestCurrentVolumePercent = currentVolumePercent;
 
-    readout.textContent = `Current volume: ${(state.volume * 100).toFixed(1)}%`;
-    readout.style.color = `rgba(238, 246, 241, ${(0.74 + state.volume * 0.26).toFixed(3)})`;
+    updateUnlockState(currentVolumePercent);
+    setSliderLocked(sliderB, sliderBRow, !hasUnlockedB);
+    setSliderLocked(sliderC, sliderCRow, !hasUnlockedC);
 
-    paintSlider(sliderA, state.a, 1);
-    paintSlider(sliderB, state.b, state.unlockTwo);
-    paintSlider(sliderC, state.c, state.unlockThree);
-    syncAudio(state.volume);
+    setSliderFill(sliderB);
+    setSliderFill(sliderC);
+    setSliderFill(sliderRider);
+    graphLine.setAttribute("d", buildPath(points));
+    graphRider.setAttribute("cx", mapX(riderPoint.x).toFixed(2));
+    graphRider.setAttribute("cy", mapY(riderPoint.v).toFixed(2));
+    renderGrid();
+    renderText(a, b, c, riderPoint, currentVolumePercent);
 
-    window.threeBodyPrototype = {
-      computeState,
-      state,
+    window.assignmentGraph = {
+      evaluatePoint,
+      sampleCurve,
+      params: { a, b, c },
+      currentVolumePercent,
+      hasUnlockedB,
+      hasUnlockedC,
+      riderPoint,
+      view: {
+        xMin: graph.xMin,
+        xMax: graph.xMax,
+        yMin: graph.yMin,
+        yMax: graph.yMax,
+      },
     };
   }
 
-  function onInput() {
-    ensureAudio();
+  submitVolumeButton.addEventListener("click", () => {
+    submissionStatus.textContent = "volume submitted";
+    submissionStatus.classList.add("is-visible");
+    openSubmissionModal(getSubmissionMessage(latestCurrentVolumePercent));
+  });
 
-    if (audioCtx && audioCtx.state === "suspended") {
-      audioCtx.resume();
+  submissionModalClose.addEventListener("click", closeSubmissionModal);
+  submissionModalBackdrop.addEventListener("click", closeSubmissionModal);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !submissionModal.hidden) {
+      closeSubmissionModal();
     }
+  });
 
+  sliderRider.addEventListener("input", () => {
+    hasUserStartedProgress = true;
     render();
-  }
-
-  sliders.forEach((slider) => {
-    slider.addEventListener("input", onInput);
-    slider.addEventListener("change", onInput);
+  });
+  sliderRider.addEventListener("change", () => {
+    hasUserStartedProgress = true;
+    render();
+  });
+  [sliderB, sliderC].forEach((slider) => {
+    slider.addEventListener("input", () => {
+      hasUserStartedProgress = true;
+      render();
+    });
+    slider.addEventListener("change", () => {
+      hasUserStartedProgress = true;
+      render();
+    });
   });
 
   render();
