@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gio Solutions | Giovanni</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="solutions-page">
+    <header class="page-header">
+        <a class="brand" href="../index.html">poba</a>
+        <nav class="page-nav" aria-label="Primary">
+            <a href="../creative/">Creative</a>
+            <a href="../business/">Business</a>
+            <a href="../gio-solutions/" aria-current="page">Gio Solutions</a>
+            <a href="https://github.com/PobaG" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+    </header>
+
+    <main class="page-main">
+        <section class="hero-panel" id="top">
+            <div class="hero-copy">
+                <p class="eyebrow">Gio Solutions</p>
+                <h1><span>useful-one-off-work</span></h1>
+                <p class="lead">Videos, websites, and computer help without extra nonsense. Scroll straight down through the three lanes, or jump to one fast if you already know what you need.</p>
+                <div class="action-row">
+                    <a class="button" href="https://github.com/PobaG" target="_blank" rel="noreferrer">View GitHub</a>
+                    <a class="button button-secondary" href="#video" data-scroll-link="true">See The Three</a>
+                </div>
+            </div>
+
+            <aside class="jump-nav" aria-label="Section jump links">
+                <p class="card-label">Jump to</p>
+                    <a href="#video" data-scroll-link="true">01 Video</a>
+                    <a href="#web" data-scroll-link="true">02 Website</a>
+                    <a href="#pc" data-scroll-link="true">03 PC Help</a>
+            </aside>
+        </section>
+
+        <section class="service-panel" id="video">
+            <div class="service-panel-copy">
+                <p class="eyebrow">01 Video</p>
+                <h2>Commercials, recording, edits, and cleanup.</h2>
+                <p>Useful when you need something finished, tightened, or made watchable without dragging the process out.</p>
+                <ul>
+                    <li>Short ads and promotional cuts</li>
+                    <li>Editing for cleaner pacing and sharper presentation</li>
+                    <li>Recording support and simple production help</li>
+                    <li>Social clips, highlights, and format cleanup</li>
+                </ul>
+            </div>
+            <div class="service-panel-side">
+                <p class="card-label">Best for</p>
+                <div class="hero-badges">
+                    <span>Ads</span>
+                    <span>Promos</span>
+                    <span>Edits</span>
+                    <span>Clips</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="service-panel" id="web">
+            <div class="service-panel-copy">
+                <p class="eyebrow">02 Website</p>
+                <h2>I will make one like this, or cleaner if that is the right move.</h2>
+                <p>Good for a direct landing page, a small business presence, or a site that currently looks more confusing than it should.</p>
+                <ul>
+                    <li>Custom personal or business pages</li>
+                    <li>Landing pages with stronger presentation</li>
+                    <li>Layout and copy cleanup for existing sites</li>
+                    <li>Simple static sites that are easy to host and maintain</li>
+                </ul>
+            </div>
+            <div class="service-panel-side">
+                <p class="card-label">Best for</p>
+                <div class="hero-badges">
+                    <span>Landing Pages</span>
+                    <span>Portfolio</span>
+                    <span>Business</span>
+                    <span>Cleanup</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="service-panel" id="pc">
+            <div class="service-panel-copy">
+                <p class="eyebrow">03 PC Building / Repair</p>
+                <h2>Laptops, desktops, upgrades, diagnostics, and general computer help.</h2>
+                <p>For machines that need clearer answers, better parts decisions, or actual troubleshooting instead of random guessing.</p>
+                <ul>
+                    <li>Parts guidance and build planning</li>
+                    <li>PC assembly and upgrade installs</li>
+                    <li>Basic diagnostics and performance cleanup</li>
+                    <li>Troubleshooting for common hardware and software issues</li>
+                </ul>
+                <div class="action-row">
+                    <a class="button" href="https://www.youtube.com/@poba.g" target="_blank" rel="noreferrer">See Creative Work</a>
+                    <a class="button button-secondary back-to-top" href="#top" data-scroll-link="true" data-back-to-top="true">Back To Top</a>
+                </div>
+            </div>
+            <div class="service-panel-side service-panel-image">
+                <p class="card-label">Operator</p>
+                <img class="process-image" src="../Assets/headshot.jpg" alt="Portrait of Giovanni.">
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const scrollLinks = document.querySelectorAll('[data-scroll-link="true"]');
+        const header = document.querySelector('.page-header');
+        let activeAnimation = null;
+
+        const easeInOutQuint = (progress) => {
+            return progress < 0.5
+                ? 16 * progress * progress * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 5) / 2;
+        };
+
+        const animateScrollTo = (targetY, { hash = '', returningTop = false } = {}) => {
+            if (activeAnimation) {
+                window.cancelAnimationFrame(activeAnimation);
+                document.body.classList.remove('is-returning-top');
+            }
+
+            const startY = window.scrollY;
+            const distance = targetY - startY;
+            const duration = Math.min(1400, Math.max(700, Math.abs(distance) * 0.75));
+            const startTime = performance.now();
+
+            if (returningTop) {
+                document.body.classList.add('is-returning-top');
+            }
+
+            const step = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = easeInOutQuint(progress);
+
+                window.scrollTo(0, startY + distance * eased);
+
+                if (progress < 1) {
+                    activeAnimation = window.requestAnimationFrame(step);
+                    return;
+                }
+
+                activeAnimation = null;
+
+                if (hash) {
+                    window.history.replaceState(null, '', hash);
+                }
+
+                if (returningTop) {
+                    window.setTimeout(() => {
+                        document.body.classList.remove('is-returning-top');
+                    }, 180);
+                }
+            };
+
+            activeAnimation = window.requestAnimationFrame(step);
+        };
+
+        scrollLinks.forEach((link) => {
+            link.addEventListener('click', (event) => {
+                const href = link.getAttribute('href');
+
+                if (!href || !href.startsWith('#')) {
+                    return;
+                }
+
+                const target = document.querySelector(href);
+
+                if (!target) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                const headerOffset = header ? header.offsetHeight + 12 : 0;
+                const targetY = Math.max(0, window.scrollY + target.getBoundingClientRect().top - headerOffset);
+                const returningTop = link.hasAttribute('data-back-to-top');
+
+                animateScrollTo(targetY, { hash: href, returningTop });
+            });
+        });
+    </script>
+</body>
+
+</html>

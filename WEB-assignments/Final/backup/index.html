@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Equation Graph Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="prototype">
+    <p class="readout" id="volumeReadout" aria-live="polite">Only V is graphed. a = 4, B = 1, C = -1.6.</p>
+    <section class="graph-panel" aria-labelledby="graphTitle">
+      <p class="graph-title" id="graphTitle">Graph Of V(x)</p>
+      <p class="graph-equation" id="graphEquation">V(x) = y<sub>1</sub> + y<sub>2</sub> / ((a / 100) + 1) + x cos(y<sub>2</sub> + C)</p>
+      <svg id="volumeGraph" class="output-graph" viewBox="0 0 520 240" role="img" aria-label="Graph of V over x">
+        <defs>
+          <clipPath id="graphClip">
+            <rect id="graphClipRect"></rect>
+          </clipPath>
+        </defs>
+        <g id="graphGrid"></g>
+        <path class="graph-axis" id="graphAxisX"></path>
+        <path class="graph-axis" id="graphAxisY"></path>
+        <path class="graph-line" id="volumeGraphLine" clip-path="url(#graphClip)"></path>
+        <circle id="volumeGraphRider" class="graph-rider" r="5" clip-path="url(#graphClip)"></circle>
+        <g id="graphLabels"></g>
+      </svg>
+      <p class="graph-meta" id="graphMeta">x range: 0 to 100 | y range: 0 to 100</p>
+    </section>
+
+    <!--
+      Math lock:
+      The y1, y2, y3, and V equations are intentionally finalized.
+      Do not change the mathematics or equation wording unless the user explicitly asks for a math update.
+    -->
+    <section class="equation-stack" aria-label="Equation list">
+      <p class="equation equation-display" id="equationY1">y<sub>1</sub> = ((-2a / 100) + 1)x + a</p>
+      <p class="equation equation-display" id="equationY2">y<sub>2</sub> = B sin(y<sub>1</sub> * 1)</p>
+      <p class="equation equation-display" id="equationY3">y<sub>3</sub> = x cos(y<sub>2</sub> + C)</p>
+      <p class="equation equation-display" id="equationV">V = y<sub>1</sub> + y<sub>2</sub> / ((a / 100) + 1) + y<sub>3</sub></p>
+    </section>
+
+    <div class="slider-stack">
+      <label class="slider-row" for="sliderRider">
+        <span class="slider-label"><span class="slider-name slider-name-lowercase">a</span><output id="valueRider">4</output></span>
+        <input
+          id="sliderRider"
+          class="body-slider"
+          type="range"
+          min="0"
+          max="100"
+          step="0.1"
+          value="4"
+          aria-label="a slider"
+        >
+        <span class="equation" id="equationRider">a changes y<sub>1</sub>, sets the y<sub>2</sub> divisor as ((a / 100) + 1), and places the dot at x = a.</span>
+      </label>
+
+      <label class="slider-row" for="sliderB">
+        <span class="slider-label">B <output id="valueB">1</output></span>
+        <input
+          id="sliderB"
+          class="body-slider"
+          type="range"
+          min="0"
+          max="10"
+          step="0.1"
+          value="1"
+          aria-label="B slider"
+        >
+        <span class="equation" id="equationB">B controls the amplitude of y<sub>2</sub>.</span>
+      </label>
+
+      <label class="slider-row" for="sliderC">
+        <span class="slider-label">C <output id="valueC">-1.6</output></span>
+        <input
+          id="sliderC"
+          class="body-slider"
+          type="range"
+          min="-1.6"
+          max="4.7"
+          step="0.1"
+          value="-1.6"
+          aria-label="C slider"
+        >
+        <span class="equation" id="equationC">C controls the amplitude of y<sub>3</sub>.</span>
+      </label>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

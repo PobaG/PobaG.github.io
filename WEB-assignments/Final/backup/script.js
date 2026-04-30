@@ -5,13 +5,6 @@
   const valueB = document.getElementById("valueB");
   const valueC = document.getElementById("valueC");
   const valueRider = document.getElementById("valueRider");
-  const currentVolume = document.getElementById("currentVolume");
-  const submissionStatus = document.getElementById("submissionStatus");
-  const submitVolumeButton = document.getElementById("submitVolumeButton");
-  const submissionModal = document.getElementById("submissionModal");
-  const submissionModalBackdrop = document.getElementById("submissionModalBackdrop");
-  const submissionModalMessage = document.getElementById("submissionModalMessage");
-  const submissionModalClose = document.getElementById("submissionModalClose");
   const readout = document.getElementById("volumeReadout");
   const graphEquation = document.getElementById("graphEquation");
   const graphMeta = document.getElementById("graphMeta");
@@ -29,12 +22,6 @@
   const graphGrid = document.getElementById("graphGrid");
   const graphLabels = document.getElementById("graphLabels");
   const graphClipRect = document.getElementById("graphClipRect");
-  const sliderBRow = sliderB.closest(".slider-row");
-  const sliderCRow = sliderC.closest(".slider-row");
-  let hasUnlockedB = false;
-  let hasUnlockedC = false;
-  let hasUserStartedProgress = false;
-  let latestCurrentVolumePercent = 0;
 
   const SVG_NS = "http://www.w3.org/2000/svg";
   const graph = {
@@ -70,71 +57,6 @@
     const percent = ((value - min) / (max - min)) * 100;
 
     slider.style.setProperty("--fill-size", `${percent.toFixed(2)}%`);
-  }
-
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
-  }
-
-  function setSliderLocked(slider, sliderRow, locked) {
-    slider.disabled = locked;
-    slider.classList.toggle("sleeping", locked);
-    slider.setAttribute("aria-disabled", String(locked));
-    sliderRow.classList.toggle("is-locked", locked);
-  }
-
-  function getSubmissionMessage(volumePercent) {
-    const volumeText = formatNumber(volumePercent, 1);
-
-    if (volumePercent <= 10) {
-      return `Dang ${volumeText}%? That is not a volume setting. That is a nervous apology with a slider attached.`;
-    }
-
-    if (volumePercent < 25) {
-      return `${volumeText}%? You submitted that with your full chest? Because the volume definitely did not.`;
-    }
-
-    if (volumePercent < 48.5) {
-      return `${volumeText}%? You are hovering in the "almost interesting" zone. Real commitment remains a rumor.`;
-    }
-
-    if (volumePercent < 70) {
-      return `${volumeText}%? Fine. Respectable. You finally stopped playing like the substitute teacher was watching.`;
-    }
-
-    if (volumePercent < 88) {
-      return `${volumeText}%? Okay, now the slider has a spine. Took you long enough.`;
-    }
-
-    if (volumePercent < 99.5) {
-      return `${volumeText}%? Extremely loud behavior. This is the kind of confidence that gets group projects ruined.`;
-    }
-
-    return `Dang 100%? how did you even get that high? PHD in physics?`;
-  }
-
-  function openSubmissionModal(message) {
-    submissionModalMessage.textContent = message;
-    submissionModal.hidden = false;
-    submissionModalClose.focus();
-  }
-
-  function closeSubmissionModal() {
-    submissionModal.hidden = true;
-  }
-
-  function updateUnlockState(currentVolumePercent) {
-    if (!hasUserStartedProgress) {
-      return;
-    }
-
-    if (!hasUnlockedB && currentVolumePercent >= 48.5) {
-      hasUnlockedB = true;
-    }
-
-    if (!hasUnlockedC && currentVolumePercent >= 88) {
-      hasUnlockedC = true;
-    }
   }
 
   // Math lock:
@@ -249,19 +171,17 @@
     );
   }
 
-  function renderText(a, b, c, riderPoint, currentVolumePercent) {
+  function renderText(a, b, c, riderPoint) {
     const origin = evaluatePoint(0, a, b, c);
     const aText = formatNumber(a, 1);
     const bText = formatNumber(b, 1);
     const cText = formatNumber(c, 1);
     const y1SlopeText = formatNumber(((-2 * a) / 100) + 1);
-    const currentVolumeText = formatNumber(currentVolumePercent, 1);
     const vAtAText = formatNumber(riderPoint.v);
 
     valueB.textContent = bText;
     valueC.textContent = cText;
     valueRider.textContent = aText;
-    currentVolume.textContent = `Current Volume: ${currentVolumeText}%`;
     readout.textContent =
       `Only V is graphed. a = ${aText}, B = ${bText}, C = ${cText}, V(a) = ${vAtAText}, V(0) = ${formatNumber(origin.v)}.`;
     graphEquation.innerHTML =
@@ -272,12 +192,8 @@
     equationY3.innerHTML =
       `y<sub>3</sub> = x cos(y<sub>2</sub> + ${cText})`;
     equationV.innerHTML = `V = y<sub>1</sub> + y<sub>2</sub> / ((${aText} / 100) + 1) + y<sub>3</sub>`;
-    equationB.textContent = hasUnlockedB
-      ? `B range: 0 to 10. Higher B increases the swing inside y2.`
-      : `B is locked until current volume reaches 48.5%.`;
-    equationC.textContent = hasUnlockedC
-      ? `C range: -1.6 to 4.7. C shifts the cosine term used inside y3.`
-      : `C is locked until current volume reaches 88%.`;
+    equationB.textContent = `B range: 0 to 10. Higher B increases the swing inside y2.`;
+    equationC.textContent = `C range: -1.6 to 4.7. C shifts the cosine term used inside y3.`;
     equationRider.textContent = `a = ${aText}; it makes y1 = (${y1SlopeText})x + ${aText}, divides y2 by ((${aText} / 100) + 1), and places the dot at x = a where V(a) = ${vAtAText}.`;
   }
 
@@ -287,12 +203,6 @@
     const c = parseFloat(sliderC.value);
     const points = sampleCurve(a, b, c);
     const riderPoint = evaluatePoint(a, a, b, c);
-    const currentVolumePercent = clamp(riderPoint.v, graph.yMin, graph.yMax);
-    latestCurrentVolumePercent = currentVolumePercent;
-
-    updateUnlockState(currentVolumePercent);
-    setSliderLocked(sliderB, sliderBRow, !hasUnlockedB);
-    setSliderLocked(sliderC, sliderCRow, !hasUnlockedC);
 
     setSliderFill(sliderB);
     setSliderFill(sliderC);
@@ -301,15 +211,12 @@
     graphRider.setAttribute("cx", mapX(riderPoint.x).toFixed(2));
     graphRider.setAttribute("cy", mapY(riderPoint.v).toFixed(2));
     renderGrid();
-    renderText(a, b, c, riderPoint, currentVolumePercent);
+    renderText(a, b, c, riderPoint);
 
     window.assignmentGraph = {
       evaluatePoint,
       sampleCurve,
       params: { a, b, c },
-      currentVolumePercent,
-      hasUnlockedB,
-      hasUnlockedC,
       riderPoint,
       view: {
         xMin: graph.xMin,
@@ -320,37 +227,9 @@
     };
   }
 
-  submitVolumeButton.addEventListener("click", () => {
-    submissionStatus.textContent = "volume submitted";
-    submissionStatus.classList.add("is-visible");
-    openSubmissionModal(getSubmissionMessage(latestCurrentVolumePercent));
-  });
-
-  submissionModalClose.addEventListener("click", closeSubmissionModal);
-  submissionModalBackdrop.addEventListener("click", closeSubmissionModal);
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !submissionModal.hidden) {
-      closeSubmissionModal();
-    }
-  });
-
-  sliderRider.addEventListener("input", () => {
-    hasUserStartedProgress = true;
-    render();
-  });
-  sliderRider.addEventListener("change", () => {
-    hasUserStartedProgress = true;
-    render();
-  });
-  [sliderB, sliderC].forEach((slider) => {
-    slider.addEventListener("input", () => {
-      hasUserStartedProgress = true;
-      render();
-    });
-    slider.addEventListener("change", () => {
-      hasUserStartedProgress = true;
-      render();
-    });
+  [sliderB, sliderC, sliderRider].forEach((slider) => {
+    slider.addEventListener("input", render);
+    slider.addEventListener("change", render);
   });
 
   render();
